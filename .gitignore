@@ -11,3 +11,4 @@ local.properties
 /app/build
 /build
 *.hprof
+app/src/main/assets/*.onnx
