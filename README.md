@@ -42,8 +42,8 @@ Chromis brings black & white photos back to life using a deep neural network run
 git clone https://github.com/rajumark/Chromis.git
 cd Chromis
 
-# Place model
-cp path/to/ddcolor-tiny-fp16.onnx app/src/main/assets/
+# Download the DDColor-Tiny FP16 ONNX model (129MB, not in repo due to GitHub size limit)
+# Place it in app/src/main/assets/ddcolor-tiny-fp16.onnx
 
 # Build
 ./gradlew assembleDebug
