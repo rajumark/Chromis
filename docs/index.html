@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Chromis — AI Photo Colorizer for Android. On-device neural network converts black & white photos to colour. 100% offline, zero data collection, complete privacy.">
+  <title>Chromis — On-Device AI Photo Colorizer | Edge AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #000000;
+      --white: #FFFFFF;
+      --accent: #E63946;
+      --gray-900: #111111;
+      --gray-800: #1a1a1a;
+      --gray-700: #222222;
+      --gray-600: #333333;
+      --gray-text: #6A6A6A;
+      --gray-light: #999999;
+      --border: #E5E5E5;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--white);
+      color: var(--black);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    a { text-decoration: none; color: inherit; transition: all 0.3s ease; }
+    img { max-width: 100%; display: block; }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    /* ══════════════════════════════════════════
+       NAVIGATION
+    ══════════════════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      height: 72px;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      transition: background 0.3s, border-color 0.3s;
+    }
+    nav.dark-mode {
+      background: rgba(0,0,0,0.85);
+      border-bottom-color: rgba(255,255,255,0.06);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+    .nav-logo {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--black);
+    }
+    nav.dark-mode .nav-logo { color: var(--white); }
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      list-style: none;
+      align-items: center;
+    }
+    .nav-links a {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--gray-text);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--black); }
+    nav.dark-mode .nav-links a { color: #888; }
+    nav.dark-mode .nav-links a:hover { color: var(--white); }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-ghost {
+      padding: 8px 18px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--gray-text);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: color 0.2s;
+    }
+    .btn-ghost:hover { color: var(--black); }
+    nav.dark-mode .btn-ghost { color: #888; }
+    nav.dark-mode .btn-ghost:hover { color: var(--white); }
+    .btn-primary-nav {
+      padding: 9px 22px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--white);
+      background: var(--black);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.3s;
+    }
+    .btn-primary-nav:hover {
+      background: #222;
+      transform: scale(1.03);
+    }
+    nav.dark-mode .btn-primary-nav {
+      background: var(--white);
+      color: var(--black);
+    }
+    nav.dark-mode .btn-primary-nav:hover { background: #eee; }
+    .mobile-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .mobile-toggle svg { width: 24px; height: 24px; }
+
+    /* ══════════════════════════════════════════
+       HERO SECTION
+    ══════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 120px 40px 80px;
+      position: relative;
+      overflow: hidden;
+      background: var(--white);
+    }
+    .hero-bg-lines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .hero-bg-lines .line {
+      position: absolute;
+      border: 1px solid rgba(0,0,0,0.04);
+      border-radius: 4px;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(0,0,0,0.04);
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--gray-text);
+      margin-bottom: 32px;
+    }
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+    .hero h1 {
+      font-size: 72px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 0.92;
+      margin-bottom: 28px;
+      color: var(--black);
+    }
+    .hero h1 .faded {
+      opacity: 0.3;
+    }
+    .hero-sub {
+      font-size: 18px;
+      color: var(--gray-text);
+      line-height: 1.7;
+      max-width: 580px;
+      margin: 0 auto 40px;
+    }
+    .hero-buttons {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 64px;
+    }
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 15px 36px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--white);
+      background: var(--black);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.3s;
+    }
+    .btn-hero-primary:hover {
+      background: #222;
+      transform: scale(1.03);
+    }
+    .btn-hero-primary svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .btn-hero-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 15px 36px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--black);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.3s;
+    }
+    .btn-hero-secondary:hover {
+      background: #F8F8F8;
+      transform: scale(1.03);
+    }
+    .btn-hero-secondary svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Hero comparison card */
+    .hero-comparison {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 50px 120px rgba(0,0,0,0.12);
+      background: #f0f0f0;
+      aspect-ratio: 16/10;
+      cursor: col-resize;
+      user-select: none;
+    }
+    .hero-comparison .comp-before,
+    .hero-comparison .comp-after {
+      position: absolute;
+      inset: 0;
+    }
+    .hero-comparison .comp-before {
+      background: linear-gradient(135deg, #ccc 0%, #999 50%, #bbb 100%);
+      z-index: 1;
+    }
+    .hero-comparison .comp-after {
+      background: linear-gradient(135deg, #4a90d9 0%, #e8a87c 30%, #85c88a 60%, #d4a574 100%);
+      z-index: 2;
+      clip-path: inset(0 50% 0 0);
+    }
+    .hero-comparison .comp-slider {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%;
+      width: 3px;
+      background: var(--white);
+      z-index: 10;
+      transform: translateX(-50%);
+      box-shadow: 0 0 12px rgba(0,0,0,0.3);
+    }
+    .hero-comparison .comp-slider::after {
+      content: '⟨ ⟩';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 44px;
+      height: 44px;
+      background: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--black);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      letter-spacing: 4px;
+    }
+    .comp-label {
+      position: absolute;
+      bottom: 20px;
+      padding: 6px 16px;
+      background: rgba(0,0,0,0.6);
+      color: var(--white);
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      z-index: 11;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .comp-label.before { left: 20px; }
+    .comp-label.after { right: 20px; }
+
+    /* Floating labels */
+    .floating-labels {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .float-label {
+      position: absolute;
+      padding: 8px 18px;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--gray-900);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      animation: float 6s ease-in-out infinite;
+    }
+    .float-label:nth-child(1) { top: 15%; left: 8%; animation-delay: 0s; }
+    .float-label:nth-child(2) { top: 25%; right: 6%; animation-delay: 1.5s; }
+    .float-label:nth-child(3) { bottom: 30%; left: 5%; animation-delay: 3s; }
+    .float-label:nth-child(4) { bottom: 20%; right: 8%; animation-delay: 4.5s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* ══════════════════════════════════════════
+       SECTION — EDGE AI / WHY ON-DEVICE
+    ══════════════════════════════════════════ */
+    .section-dark {
+      background: #090909;
+      color: var(--white);
+      padding: 140px 0;
+    }
+    .section-light {
+      background: var(--white);
+      padding: 140px 0;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 72px;
+    }
+    .section-header h2 {
+      font-size: 52px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 0.92;
+    }
+    .section-header .faded {
+      opacity: 0.3;
+    }
+    .section-header p {
+      font-size: 18px;
+      color: var(--gray-text);
+      max-width: 580px;
+      margin: 20px auto 0;
+      line-height: 1.7;
+    }
+    .section-dark .section-header p { color: #888; }
+
+    /* Edge AI comparison */
+    .edge-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      border-radius: 20px;
+      overflow: hidden;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .edge-col {
+      padding: 48px 40px;
+    }
+    .edge-col.cloud {
+      background: #111;
+    }
+    .edge-col.ondevice {
+      background: #1a1a1a;
+      border: 1px solid #333;
+    }
+    .edge-col h3 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .edge-col.cloud h3 { color: #666; }
+    .edge-col.ondevice h3 { color: var(--white); }
+    .edge-col.ondevice h3 .tag {
+      padding: 3px 10px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 999px;
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+    }
+    .edge-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .edge-row:last-child { border-bottom: none; }
+    .edge-col.cloud .edge-row { color: #555; }
+    .edge-col.ondevice .edge-row { color: #ccc; }
+    .edge-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .edge-col.cloud .edge-icon { background: rgba(255,255,255,0.05); color: #555; }
+    .edge-col.ondevice .edge-icon { background: rgba(255,255,255,0.08); color: #4ade80; }
+
+    /* ══════════════════════════════════════════
+       SECTION — TECH STACK
+    ══════════════════════════════════════════ */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .tech-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 32px;
+      transition: all 0.4s ease;
+    }
+    .tech-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.06);
+    }
+    .tech-card .tc-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: #f5f5f5;
+      border: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      font-size: 1.4rem;
+    }
+    .tech-card h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .tech-card p {
+      font-size: 0.9rem;
+      color: var(--gray-text);
+      line-height: 1.7;
+    }
+    .tech-card .tc-badge {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 4px 12px;
+      background: #f5f5f5;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-text);
+    }
+
+    /* ══════════════════════════════════════════
+       SECTION — INFERENCE PIPELINE
+    ══════════════════════════════════════════ */
+    .pipeline-flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .pipeline-flow::before {
+      content: '';
+      position: absolute;
+      top: 40px;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: var(--border);
+      z-index: 0;
+    }
+    .pipeline-flow .line-fill {
+      position: absolute;
+      top: 40px;
+      left: 10%;
+      height: 2px;
+      background: var(--black);
+      width: 0;
+      z-index: 1;
+      transition: width 2s ease;
+    }
+    .pipeline-flow.animated .line-fill {
+      width: 80%;
+    }
+    .pipeline-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+    .pipeline-step .ps-num {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--white);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--gray-text);
+      margin-bottom: 20px;
+      transition: all 0.5s ease;
+    }
+    .pipeline-step.active .ps-num {
+      background: var(--black);
+      border-color: var(--black);
+      color: var(--white);
+    }
+    .pipeline-step h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .pipeline-step p {
+      font-size: 0.78rem;
+      color: var(--gray-text);
+      max-width: 150px;
+    }
+
+    /* ══════════════════════════════════════════
+       SECTION — CODE ARCHITECTURE
+    ══════════════════════════════════════════ */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .arch-code {
+      background: var(--gray-900);
+      border-radius: 20px;
+      padding: 32px;
+      overflow: hidden;
+      border: 1px solid #222;
+    }
+    .arch-code .code-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .arch-code .code-header .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .arch-code .code-header .dot:nth-child(1) { background: #ff5f57; }
+    .arch-code .code-header .dot:nth-child(2) { background: #ffbd2e; }
+    .arch-code .code-header .dot:nth-child(3) { background: #28c840; }
+    .arch-code pre {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.82rem;
+      line-height: 1.8;
+      color: #aaa;
+      overflow-x: auto;
+    }
+    .arch-code pre .kw { color: #c678dd; }
+    .arch-code pre .fn { color: #61afef; }
+    .arch-code pre .str { color: #98c379; }
+    .arch-code pre .cm { color: #5c6370; }
+    .arch-code pre .num { color: #d19a66; }
+    .arch-text h2 {
+      font-size: 44px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 0.95;
+      margin-bottom: 24px;
+    }
+    .arch-text p {
+      font-size: 16px;
+      color: var(--gray-text);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .arch-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 32px;
+    }
+    .arch-stat .as-num {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--black);
+    }
+    .arch-stat .as-label {
+      font-size: 0.82rem;
+      color: var(--gray-text);
+    }
+
+    /* ══════════════════════════════════════════
+       SECTION — PRIVACY
+    ══════════════════════════════════════════ */
+    .privacy-card {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 24px;
+      padding: 64px;
+      text-align: center;
+    }
+    .privacy-card .pc-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 28px;
+    }
+    .privacy-card .pc-icon svg {
+      width: 32px;
+      height: 32px;
+      stroke: var(--white);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .privacy-card h2 {
+      font-size: 36px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .privacy-card p {
+      font-size: 16px;
+      color: #888;
+      line-height: 1.7;
+      max-width: 500px;
+      margin: 0 auto 32px;
+    }
+    .privacy-badges {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .privacy-badge {
+      padding: 10px 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #aaa;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .privacy-badge .check {
+      color: #4ade80;
+      font-weight: 700;
+    }
+
+    /* ══════════════════════════════════════════
+       SECTION — FAQ
+    ══════════════════════════════════════════ */
+    .faq-list {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 24px 0;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--black);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--font);
+      text-align: left;
+      transition: color 0.2s;
+    }
+    .faq-question:hover { color: var(--gray-text); }
+    .faq-question .faq-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.3s;
+      font-size: 14px;
+      color: var(--black);
+    }
+    .faq-item.open .faq-question .faq-icon {
+      background: var(--black);
+      color: var(--white);
+      transform: rotate(45deg);
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.4s ease;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+      padding-bottom: 24px;
+    }
+    .faq-answer p {
+      font-size: 0.95rem;
+      color: var(--gray-text);
+      line-height: 1.7;
+    }
+
+    /* ══════════════════════════════════════════
+       FINAL CTA
+    ══════════════════════════════════════════ */
+    .final-cta {
+      text-align: center;
+      padding: 160px 40px;
+    }
+    .final-cta h2 {
+      font-size: 64px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 0.92;
+      margin-bottom: 20px;
+      color: var(--white);
+    }
+    .final-cta p {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 48px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-cta-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 44px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--black);
+      background: var(--white);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.3s;
+    }
+    .btn-cta-primary:hover {
+      background: #eee;
+      transform: scale(1.03);
+    }
+    .btn-cta-primary svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .btn-cta-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 44px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--white);
+      background: transparent;
+      border: 1px solid #333;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.3s;
+    }
+    .btn-cta-secondary:hover {
+      border-color: #666;
+      background: rgba(255,255,255,0.05);
+      transform: scale(1.03);
+    }
+    .btn-cta-secondary svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ══════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════ */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 64px 0 40px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+    .footer-brand .f-logo {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 14px;
+      letter-spacing: -0.02em;
+    }
+    .footer-brand p {
+      font-size: 0.88rem;
+      color: #666;
+      line-height: 1.7;
+      max-width: 320px;
+    }
+    .footer-brand .f-author {
+      margin-top: 16px;
+      font-size: 0.82rem;
+      color: #555;
+    }
+    .footer-col h4 {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .footer-col ul {
+      list-style: none;
+    }
+    .footer-col ul li {
+      margin-bottom: 12px;
+    }
+    .footer-col ul a {
+      font-size: 0.88rem;
+      color: #888;
+    }
+    .footer-col ul a:hover { color: var(--white); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-bottom p {
+      font-size: 0.82rem;
+      color: #555;
+    }
+
+    /* ══════════════════════════════════════════
+       SCROLL ANIMATIONS
+    ══════════════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .hero h1 { font-size: 52px; }
+      .section-header h2 { font-size: 40px; }
+      .final-cta h2 { font-size: 48px; }
+      .tech-grid { grid-template-columns: repeat(2, 1fr); }
+      .pipeline-flow { grid-template-columns: repeat(3, 1fr); }
+      .pipeline-flow::before, .pipeline-flow .line-fill { display: none; }
+      .arch-grid { grid-template-columns: 1fr; }
+      .edge-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 0 20px; }
+      .hero { padding: 100px 20px 60px; min-height: auto; }
+      .hero h1 { font-size: 36px; }
+      .hero-sub { font-size: 16px; }
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 72px; left: 0; right: 0;
+        background: var(--white);
+        border-bottom: 1px solid var(--border);
+        padding: 16px 0;
+        gap: 0;
+      }
+      nav.dark-mode .nav-links.open { background: #111; }
+      .nav-links.open a { display: block; padding: 12px 24px; }
+      .nav-links.open .btn-primary-nav { margin: 8px 24px; text-align: center; }
+      .mobile-toggle { display: block; }
+      .btn-ghost { display: none; }
+
+      .tech-grid { grid-template-columns: 1fr; }
+      .pipeline-flow { grid-template-columns: 1fr; gap: 24px; }
+      .section-dark, .section-light { padding: 80px 0; }
+      .section-header h2 { font-size: 32px; }
+      .privacy-card { padding: 40px 24px; }
+      .privacy-card h2 { font-size: 28px; }
+      .final-cta { padding: 100px 20px; }
+      .final-cta h2 { font-size: 36px; }
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+      .floating-labels { display: none; }
+      .arch-text h2 { font-size: 32px; }
+      .arch-stats { flex-direction: column; gap: 16px; }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 30px; }
+      .hero-buttons { flex-direction: column; align-items: center; }
+      .btn-hero-primary, .btn-hero-secondary { width: 100%; max-width: 280px; justify-content: center; }
+      .final-cta h2 { font-size: 28px; }
+      .cta-buttons { flex-direction: column; align-items: center; }
+      .btn-cta-primary, .btn-cta-secondary { width: 100%; max-width: 280px; justify-content: center; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════
+       NAVIGATION
+  ══════════════════════════════════════════ -->
+  <nav id="mainNav">
+    <div class="container">
+      <div class="nav-logo">Chromis</div>
+      <button class="mobile-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#stack">Stack</a></li>
+        <li><a href="#pipeline">How it Works</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="https://github.com/rajumark/Chromis" class="btn-primary-nav" style="border-radius:6px;">GitHub</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="https://github.com/rajumark/Chromis/releases" class="btn-primary-nav" style="border-radius:6px;">Download APK</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════════
+       HERO
+  ══════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-bg-lines">
+      <div class="line" style="left:8%;top:10%;width:1px;height:180px;"></div>
+      <div class="line" style="left:15%;top:20%;width:1px;height:260px;"></div>
+      <div class="line" style="right:12%;top:8%;width:1px;height:200px;"></div>
+      <div class="line" style="right:20%;top:25%;width:1px;height:300px;"></div>
+      <div class="line" style="left:25%;bottom:15%;width:1px;height:160px;"></div>
+      <div class="line" style="right:30%;bottom:10%;width:1px;height:220px;"></div>
+      <div class="line" style="left:5%;top:50%;width:120px;height:1px;"></div>
+      <div class="line" style="right:5%;top:40%;width:100px;height:1px;"></div>
+    </div>
+
+    <div class="floating-labels">
+      <div class="float-label">On-Device AI</div>
+      <div class="float-label">Zero Data Collection</div>
+      <div class="float-label">DDColor Neural Network</div>
+      <div class="float-label">100% Offline</div>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-badge reveal">
+        <span class="dot"></span>
+        Open Source &middot; MIT License
+      </div>
+      <h1 class="reveal">
+        Bring Black &<br>
+        White Photos<br>
+        <span class="faded">Back to Life.</span>
+      </h1>
+      <p class="hero-sub reveal reveal-delay-1">
+        An Android app that colorizes black & white photos using a deep neural network running entirely on your device. No cloud. No API. No data leaving your phone.
+      </p>
+      <div class="hero-buttons reveal reveal-delay-2">
+        <a href="https://github.com/rajumark/Chromis/releases" class="btn-hero-primary">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download APK
+        </a>
+        <a href="https://github.com/rajumark/Chromis" class="btn-hero-secondary">
+          <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          View on GitHub
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-comparison reveal reveal-delay-3" id="heroCompare">
+      <div class="comp-before"></div>
+      <div class="comp-after" id="heroAfter"></div>
+      <div class="comp-slider" id="heroSlider"></div>
+      <span class="comp-label before">Before</span>
+      <span class="comp-label after">After</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SECTION — WHY ON-DEVICE MATTERS
+  ══════════════════════════════════════════ -->
+  <section class="section-dark" id="features">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>Why on-device<br><span class="faded">actually matters.</span></h2>
+        <p>Cloud AI means your photos leave your phone. On-device AI means they never do.</p>
+      </div>
+
+      <div class="edge-grid reveal">
+        <div class="edge-col cloud">
+          <h3>Cloud-Based Apps</h3>
+          <div class="edge-row"><span class="edge-icon">✕</span> Photos uploaded to remote servers</div>
+          <div class="edge-row"><span class="edge-icon">✕</span> Requires constant internet connection</div>
+          <div class="edge-row"><span class="edge-icon">✕</span> Per-image API pricing adds up</div>
+          <div class="edge-row"><span class="edge-icon">✕</span> Unknown data retention policies</div>
+          <div class="edge-row"><span class="edge-icon">✕</span> 2-5s network round-trip latency</div>
+          <div class="edge-row"><span class="edge-icon">✕</span> Fails without connectivity</div>
+        </div>
+        <div class="edge-col ondevice">
+          <h3>Chromis <span class="tag">Edge AI</span></h3>
+          <div class="edge-row"><span class="edge-icon">✓</span> Inference runs on your CPU</div>
+          <div class="edge-row"><span class="edge-icon">✓</span> Works fully offline, always</div>
+          <div class="edge-row"><span class="edge-icon">✓</span> Free after install, forever</div>
+          <div class="edge-row"><span class="edge-icon">✓</span> Zero data collection, zero tracking</div>
+          <div class="edge-row"><span class="edge-icon">✓</span> Sub-second local inference</div>
+          <div class="edge-row"><span class="edge-icon">✓</span> Airplanes, remote areas, anywhere</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SECTION — TECH STACK
+  ══════════════════════════════════════════ -->
+  <section class="section-light" id="stack">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>Built with <span class="faded">real technology.</span></h2>
+        <p>Every component chosen for on-device performance. No shortcuts.</p>
+      </div>
+
+      <div class="tech-grid">
+        <div class="tech-card reveal reveal-delay-1">
+          <div class="tc-icon">🧠</div>
+          <h3>DDColor Neural Network</h3>
+          <p>Deep colourization model predicting chrominance channels in CIE Lab colour space. Tiny FP16 variant optimized for mobile.</p>
+          <span class="tc-badge">129 MB ONNX</span>
+        </div>
+
+        <div class="tech-card reveal reveal-delay-2">
+          <div class="tc-icon">⚡</div>
+          <h3>ONNX Runtime</h3>
+          <p>Microsoft's cross-platform ML inference engine. 4-thread parallel execution on-device with ALL_OPT optimization level.</p>
+          <span class="tc-badge">v1.17.0</span>
+        </div>
+
+        <div class="tech-card reveal reveal-delay-3">
+          <div class="tc-icon">👁</div>
+          <h3>OpenCV</h3>
+          <p>Image preprocessing and postprocessing. RGB→Lab conversion, channel splitting, chrominance upscaling back to original resolution.</p>
+          <span class="tc-badge">v4.5.3</span>
+        </div>
+
+        <div class="tech-card reveal reveal-delay-1">
+          <div class="tc-icon">🎨</div>
+          <h3>Jetpack Compose</h3>
+          <p>100% declarative UI with Material Design 3. No XML layouts. Single-activity architecture.</p>
+          <span class="tc-badge">Material 3</span>
+        </div>
+
+        <div class="tech-card reveal reveal-delay-2">
+          <div class="tc-icon">📱</div>
+          <h3>Multi-Arch Native</h3>
+          <p>Native libraries compiled for arm64-v8a, armeabi-v7a, x86, and x86_64. Runs on every Android device.</p>
+          <span class="tc-badge">4 ABIs</span>
+        </div>
+
+        <div class="tech-card reveal reveal-delay-3">
+          <div class="tc-icon">🔒</div>
+          <h3>Zero Network Calls</h3>
+          <p>No INTERNET permission. No analytics. No telemetry. The APK itself proves it — grep the manifest.</p>
+          <span class="tc-badge">Privacy First</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SECTION — INFERENCE PIPELINE
+  ══════════════════════════════════════════ -->
+  <section class="section-dark" id="pipeline">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>The inference<br><span class="faded">pipeline.</span></h2>
+        <p>From gallery picker to colorized output — the complete on-device ML flow.</p>
+      </div>
+
+      <div class="pipeline-flow" id="pipelineFlow">
+        <div class="line-fill"></div>
+
+        <div class="pipeline-step reveal reveal-delay-1">
+          <div class="ps-num">01</div>
+          <h4>Pick Photo</h4>
+          <p>Gallery intent decodes image to Bitmap</p>
+        </div>
+
+        <div class="pipeline-step reveal reveal-delay-2">
+          <div class="ps-num">02</div>
+          <h4>Lab Conversion</h4>
+          <p>OpenCV converts RGB→CIE Lab, extracts L channel</p>
+        </div>
+
+        <div class="pipeline-step reveal reveal-delay-3">
+          <div class="ps-num">03</div>
+          <h4>ONNX Inference</h4>
+          <p>DDColor-Tiny predicts a,b chrominance at 512×512</p>
+        </div>
+
+        <div class="pipeline-step reveal reveal-delay-4">
+          <div class="ps-num">04</div>
+          <h4>Upscale & Merge</h4>
+          <p>Chrominance upscaled to original resolution, merged with L</p>
+        </div>
+
+        <div class="pipeline-step reveal reveal-delay-4">
+          <div class="ps-num">05</div>
+          <h4>Colour Output</h4>
+          <p>Lab→RGB conversion, side-by-side comparison displayed</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SECTION — CODE ARCHITECTURE
+  ══════════════════════════════════════════ -->
+  <section class="section-light">
+    <div class="container">
+      <div class="arch-grid">
+        <div class="arch-code reveal">
+          <div class="code-header">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+<pre><span class="cm">// DDColorEngine.kt — 102 lines of pure inference</span>
+
+<span class="kw">class</span> <span class="fn">DDColorEngine</span>(<span class="kw">private val</span> context: Context) {
+
+    <span class="kw">private val</span> env = OrtEnvironment.<span class="fn">getEnvironment</span>()
+    <span class="kw">private val</span> session: OrtSession
+
+    <span class="kw">init</span> {
+        <span class="kw">val</span> modelBytes = context.assets
+            .<span class="fn">open</span>(<span class="str">"ddcolor-tiny-fp16.onnx"</span>)
+            .<span class="fn">readBytes</span>()
+        <span class="kw">val</span> opts = OrtSession.SessionOptions().<span class="kw">apply</span> {
+            <span class="fn">setOptimizationLevel</span>(ALL_OPT)
+            <span class="fn">setIntraOpNumThreads</span>(<span class="num">4</span>)
+            <span class="fn">setInterOpNumThreads</span>(<span class="num">4</span>)
+        }
+        session = env.<span class="fn">createSession</span>(modelBytes, opts)
+    }
+
+    <span class="kw">fun</span> <span class="fn">colorize</span>(input: Bitmap): Bitmap {
+        <span class="cm">// 1. RGB → Lab, extract L channel</span>
+        <span class="cm">// 2. Resize to 512×512, normalize</span>
+        <span class="cm">// 3. ONNX inference → predict a,b</span>
+        <span class="cm">// 4. Upscale a,b to original size</span>
+        <span class="cm">// 5. Merge L + a,b → RGB Bitmap</span>
+    }
+}</pre>
+        </div>
+
+        <div class="arch-text reveal reveal-delay-2">
+          <h2>555 lines of Kotlin. Zero dependencies on cloud.</h2>
+          <p>The entire app — UI, inference engine, image processing — fits in 6 source files. The ONNX model does the heavy lifting. The Kotlin code is the orchestration layer.</p>
+          <p>ONNX Runtime handles thread management, memory allocation, and CPU optimization. OpenCV handles colour space math. Compose handles the UI. Each tool does one thing well.</p>
+          <div class="arch-stats">
+            <div class="arch-stat">
+              <div class="as-num">555</div>
+              <div class="as-label">Lines of Kotlin</div>
+            </div>
+            <div class="arch-stat">
+              <div class="as-num">6</div>
+              <div class="as-label">Source Files</div>
+            </div>
+            <div class="arch-stat">
+              <div class="as-num">0</div>
+              <div class="as-label">Network Calls</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SECTION — PRIVACY
+  ══════════════════════════════════════════ -->
+  <section class="section-dark">
+    <div class="container">
+      <div class="privacy-card reveal">
+        <div class="pc-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h2>Your photos never leave your phone.</h2>
+        <p>The APK has no INTERNET permission. No analytics SDK. No crash reporting. No tracking. This isn't a policy — it's architecture.</p>
+        <div class="privacy-badges">
+          <div class="privacy-badge"><span class="check">✓</span> No INTERNET permission</div>
+          <div class="privacy-badge"><span class="check">✓</span> No analytics</div>
+          <div class="privacy-badge"><span class="check">✓</span> No data collection</div>
+          <div class="privacy-badge"><span class="check">✓</span> Open source — verify it yourself</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SECTION — FAQ
+  ══════════════════════════════════════════ -->
+  <section class="section-light" id="faq">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>Questions?</h2>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            What model does Chromis use?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Chromis uses DDColor-Tiny, a deep learning colourization architecture exported to ONNX format (FP16). It predicts the a and b chrominance channels in CIE Lab colour space from a grayscale input, while preserving the original luminance channel for maximum detail retention.</p>
+          </div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            How is this different from cloud colourizers?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Cloud colourizers upload your photos to remote servers. Chromis runs the entire pipeline on your device — no network calls, no data leaving your phone. The APK doesn't even have the INTERNET permission declared. This is architectural privacy, not a privacy policy.</p>
+          </div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            Why ONNX Runtime instead of TensorFlow Lite?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>The DDColor model was trained and exported in ONNX format. ONNX Runtime provides cross-platform inference with aggressive graph optimizations and multi-threaded CPU execution. It's the standard format for model interoperability — train anywhere, run anywhere.</p>
+          </div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            What's the minimum Android version?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Android 8.0 (API 26) or higher. The app uses Jetpack Compose which requires API 21+, but ONNX Runtime and the native libraries target API 26+.</p>
+          </div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            How fast is the colourization?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Processing typically takes 1-3 seconds on modern devices (Snapdragon 8-series, Tensor, Dimensity 9000+). Older devices may take 5-8 seconds. The model runs on 4 CPU threads with ONNX Runtime's ALL_OPT optimization level.</p>
+          </div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-question">
+            Can I see the code?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Yes. The entire project is open source under the MIT license on GitHub. The inference engine is 102 lines in DDColorEngine.kt. The Compose UI is 393 lines in MainActivity.kt. Total Kotlin: 555 lines across 6 files.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       FINAL CTA
+  ══════════════════════════════════════════ -->
+  <section class="section-dark final-cta">
+    <div class="container">
+      <h2 class="reveal">Your memories<br>deserve colour.</h2>
+      <p class="reveal reveal-delay-1">Download the APK. Explore the code. Verify the privacy claims yourself.</p>
+      <div class="cta-buttons reveal reveal-delay-2">
+        <a href="https://github.com/rajumark/Chromis/releases" class="btn-cta-primary">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download APK
+        </a>
+        <a href="https://github.com/rajumark/Chromis" class="btn-cta-secondary">
+          <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          View on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════ -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="f-logo">Chromis</div>
+          <p>On-device AI photo colorizer for Android. Open source, MIT licensed. Built with ONNX Runtime, DDColor, and OpenCV.</p>
+          <div class="f-author">Built by Raju Shingadiya</div>
+        </div>
+        <div class="footer-col">
+          <h4>Project</h4>
+          <ul>
+            <li><a href="https://github.com/rajumark/Chromis">Source Code</a></li>
+            <li><a href="https://github.com/rajumark/Chromis/releases">Releases</a></li>
+            <li><a href="https://github.com/rajumark/Chromis/issues">Issues</a></li>
+            <li><a href="#">License (MIT)</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="https://github.com/rajumark/Chromis#readme">Documentation</a></li>
+            <li><a href="https://github.com/rajumark/Chromis/blob/main/app/build.gradle">Build Config</a></li>
+            <li><a href="https://rajumark.github.io/">Author</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Chromis. MIT License.</p>
+        <p>Built with ONNX Runtime, DDColor &amp; OpenCV</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════════
+       SCRIPTS
+  ══════════════════════════════════════════ -->
+  <script>
+    // ── Scroll reveal ──
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ── Nav dark mode ──
+    const nav = document.getElementById('mainNav');
+    const darkSections = document.querySelectorAll('.section-dark, .final-cta');
+    const navObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && e.intersectionRatio > 0.3) {
+          nav.classList.add('dark-mode');
+        }
+      });
+    }, { threshold: 0.35 });
+    darkSections.forEach(s => navObserver.observe(s));
+
+    const lightObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && e.intersectionRatio > 0.5) {
+          nav.classList.remove('dark-mode');
+        }
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('.section-light, .hero').forEach(s => lightObserver.observe(s));
+
+    // ── Comparison slider ──
+    function initSlider(containerId, afterId, sliderId) {
+      const container = document.getElementById(containerId);
+      const after = document.getElementById(afterId);
+      const slider = document.getElementById(sliderId);
+      if (!container || !after || !slider) return;
+      let isDragging = false;
+      function updateSlider(x) {
+        const rect = container.getBoundingClientRect();
+        let pos = (x - rect.left) / rect.width;
+        pos = Math.max(0, Math.min(1, pos));
+        after.style.clipPath = 'inset(0 ' + ((1 - pos) * 100) + '% 0 0)';
+        slider.style.left = (pos * 100) + '%';
+      }
+      container.addEventListener('mousedown', (e) => { isDragging = true; updateSlider(e.clientX); });
+      container.addEventListener('touchstart', (e) => { isDragging = true; updateSlider(e.touches[0].clientX); }, { passive: true });
+      document.addEventListener('mousemove', (e) => { if (isDragging) updateSlider(e.clientX); });
+      document.addEventListener('touchmove', (e) => { if (isDragging) updateSlider(e.touches[0].clientX); }, { passive: true });
+      document.addEventListener('mouseup', () => { isDragging = false; });
+      document.addEventListener('touchend', () => { isDragging = false; });
+    }
+    initSlider('heroCompare', 'heroAfter', 'heroSlider');
+
+    // ── Pipeline timeline animation ──
+    const pipeline = document.getElementById('pipelineFlow');
+    if (pipeline) {
+      const plObserver = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            pipeline.classList.add('animated');
+            const steps = pipeline.querySelectorAll('.pipeline-step');
+            steps.forEach((step, i) => {
+              setTimeout(() => step.classList.add('active'), i * 300);
+            });
+            plObserver.unobserve(pipeline);
+          }
+        });
+      }, { threshold: 0.3 });
+      plObserver.observe(pipeline);
+    }
+
+    // ── FAQ accordion ──
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+      });
+    });
+  </script>
+</body>
+</html>
