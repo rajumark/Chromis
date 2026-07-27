@@ -208,6 +208,26 @@
     .hero h1 .hero-hl-br {
       display: none;
     }
+    .hero-title-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 0.92em;
+      margin-bottom: 28px;
+    }
+    .hero-title-text {
+      position: absolute;
+      white-space: nowrap;
+      transition: opacity 0.7s ease, transform 0.7s ease;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+    }
+    .hero-title-text.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
     .hero-sub {
       font-size: 18px;
       color: var(--gray-text);
@@ -855,6 +875,157 @@
     }
 
     /* ══════════════════════════════════════════
+       SECTION — PRICING
+    ══════════════════════════════════════════ */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+    .pricing-card {
+      border-radius: 24px;
+      padding: 48px 36px;
+      border: 1px solid #222;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .pricing-card-free {
+      background: #111;
+    }
+    .pricing-card-premium {
+      background: #0a0a0a;
+      border-color: #333;
+    }
+    .pricing-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 24px;
+    }
+    .pricing-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 20px;
+    }
+    .pricing-amount {
+      font-size: 3.2rem;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .pricing-amount.strike {
+      font-size: 1.6rem;
+      color: #555;
+      text-decoration: line-through;
+      margin-bottom: 4px;
+    }
+    .pricing-currency {
+      font-size: 1.6rem;
+      vertical-align: super;
+    }
+    .pricing-period {
+      font-size: 1rem;
+      color: #666;
+      font-weight: 500;
+    }
+    .pricing-subtext {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+    .pricing-features {
+      list-style: none;
+      text-align: left;
+      width: 100%;
+      margin-bottom: 36px;
+    }
+    .pricing-features li {
+      padding: 10px 0;
+      font-size: 0.88rem;
+      color: #aaa;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pricing-features li .check {
+      color: #4ade80;
+      font-weight: 700;
+    }
+    .pricing-features li .cross {
+      color: #555;
+      font-size: 0.8rem;
+    }
+    .pricing-btn {
+      display: inline-block;
+      padding: 16px 36px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--black);
+      background: var(--white);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all 0.3s;
+      text-decoration: none;
+      width: 100%;
+      text-align: center;
+    }
+    .pricing-btn:hover {
+      background: #eee;
+      transform: scale(1.02);
+    }
+    .pricing-btn-disabled {
+      color: #555;
+      background: transparent;
+      border: 1px solid #333;
+      cursor: default;
+      pointer-events: none;
+    }
+    .pricing-btn-disabled:hover {
+      transform: none;
+      background: transparent;
+    }
+    .pricing-footnote {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 16px;
+      font-style: italic;
+    }
+    .pricing-fun {
+      max-width: 680px;
+      margin: 48px auto 0;
+      text-align: center;
+      padding: 28px 36px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid #222;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      color: #888;
+      line-height: 1.7;
+    }
+    .pricing-fun strong {
+      color: var(--white);
+    }
+
+    @media (max-width: 768px) {
+      .pricing-grid { grid-template-columns: 1fr; }
+      .pricing-card { padding: 36px 24px; }
+      .pricing-amount { font-size: 2.6rem; }
+    }
+
+    /* ══════════════════════════════════════════
        SECTION — FAQ
     ══════════════════════════════════════════ */
     .faq-list {
@@ -1254,7 +1425,18 @@
 
       <div class="hero-content">
       <h1 class="reveal">
-        Restore <span class="faded">Your Memories</span>
+        <div class="hero-title-wrap" id="heroTitleWrap">
+          <span class="hero-title-text active">Chromis — Feel the Past</span>
+          <span class="hero-title-text">Moments in Colour, by Chromis</span>
+          <span class="hero-title-text">Never Fade with Chromis</span>
+          <span class="hero-title-text">Life in Colour — Chromis</span>
+          <span class="hero-title-text">Chromis — Keep Every Hue</span>
+          <span class="hero-title-text">Colour the Memories with Chromis</span>
+          <span class="hero-title-text">Forever in Colour, Powered by Chromis</span>
+          <span class="hero-title-text">Chromis — Back Then, in Colour</span>
+          <span class="hero-title-text">Your Story in Colour — Chromis</span>
+          <span class="hero-title-text">A Second Life with Chromis</span>
+        </div>
       </h1>
       <p class="hero-sub reveal reveal-delay-1">
         On-device AI colorization for Android.
@@ -1680,6 +1862,59 @@
   </section>
 
   <!-- ══════════════════════════════════════════
+       SECTION — PRICING
+  ══════════════════════════════════════════ -->
+  <section class="section-dark" id="pricing">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>Pick a plan.<br><span class="faded">We dare you.</span></h2>
+        <p>Hours of executive meetings. Spreadsheets. ROI projections. We saved you the trouble.</p>
+      </div>
+
+      <div class="pricing-grid reveal">
+        <div class="pricing-card pricing-card-free">
+          <div class="pricing-badge">CHOOSE WISELY</div>
+          <div class="pricing-name">The Only Plan</div>
+          <div class="pricing-amount"><span class="pricing-currency">$</span>0<span class="pricing-period"> .00</span></div>
+          <div class="pricing-subtext">One-time payment. In perpetuity. No take-backs.</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> Full app, not a demo</li>
+            <li><span class="check">✓</span> No "Pro" tier exists</li>
+            <li><span class="check">✓</span> No subscription to cancel</li>
+            <li><span class="check">✓</span> All future updates</li>
+            <li><span class="check">✓</span> Source code included</li>
+            <li><span class="check">✓</span> Unlimited colorizations</li>
+            <li><span class="check">✓</span> No dark patterns</li>
+          </ul>
+          <a href="https://github.com/rajumark/Chromis/releases" class="pricing-btn">Download APK — It's Free</a>
+          <div class="pricing-footnote">No credit card required. Not even for show.</div>
+        </div>
+
+        <div class="pricing-card pricing-card-premium">
+          <div class="pricing-badge">FOR COMPLETIONISTS</div>
+          <div class="pricing-name">Premium+ Pro Max Ultra</div>
+          <div class="pricing-amount strike"><span class="pricing-currency">$</span>49<span class="pricing-period"> .99/mo</span></div>
+          <div class="pricing-amount" style="font-size:1.2rem;color:#666;">Also <span style="color:var(--white);">$0.00</span></div>
+          <div class="pricing-subtext">FOMO edition. Same app, fancier name.</div>
+          <ul class="pricing-features">
+            <li><span class="check">✓</span> Exactly the same features</li>
+            <li><span class="check">✓</span> Identical neural network</li>
+            <li><span class="check">✓</span> Zero extra perks</li>
+            <li><span class="cross">✕</span> We couldn't think of anything</li>
+            <li><span class="cross">✕</span> Neither could the competition</li>
+          </ul>
+          <div class="pricing-btn pricing-btn-disabled">Sold Out (Sorry)</div>
+          <div class="pricing-footnote">The free one works better anyway.</div>
+        </div>
+      </div>
+
+      <div class="pricing-fun reveal">
+        <p>Chromis is open source under MIT. That means you can audit every line, fork the repo, build it yourself, and still pay exactly <strong>$0.00</strong>. Our investors hate this one weird trick.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
        SECTION — FAQ
   ══════════════════════════════════════════ -->
   <section class="section-light" id="faq">
@@ -1899,6 +2134,18 @@
         if (!isOpen) item.classList.add('open');
       });
     });
+
+    // ── Hero title rotation ──
+    (function() {
+      const spans = document.querySelectorAll('#heroTitleWrap .hero-title-text');
+      if (spans.length < 2) return;
+      let idx = 0;
+      setInterval(() => {
+        spans[idx].classList.remove('active');
+        idx = (idx + 1) % spans.length;
+        spans[idx].classList.add('active');
+      }, 4000);
+    })();
 
     // ── Credit chip mouse tracking ──
     document.querySelectorAll('.credit-chip').forEach(chip => {

@@ -23,6 +23,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -77,6 +78,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -156,6 +158,15 @@ fun ChromisApp(engine: DDColorEngine?) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) {
+            val loaded = loadHistoryFromDisk(context)
+            withContext(Dispatchers.Main) {
+                history.addAll(loaded)
+            }
+        }
+    }
+
     val imageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -180,6 +191,9 @@ fun ChromisApp(engine: DDColorEngine?) {
                         withContext(Dispatchers.Main) {
                             if (result != null) {
                                 val final = ColorizedImage(bitmap, result)
+                                withContext(Dispatchers.IO) {
+                                    saveImagePair(context, final)
+                                }
                                 history.add(0, final)
                                 activeImage = final
                             } else {
@@ -219,6 +233,10 @@ fun ChromisApp(engine: DDColorEngine?) {
                     activeImage = item
                     currentScreen = "image"
                 },
+                onImageDelete = { item ->
+                    deleteImagePair(context, item.timestamp)
+                    history.remove(item)
+                },
             )
             "image" -> ImageScreen(
                 image = activeImage,
@@ -255,13 +273,16 @@ fun ChromisApp(engine: DDColorEngine?) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     history: List<ColorizedImage>,
     onPickImage: () -> Unit,
     onImageClick: (ColorizedImage) -> Unit,
+    onImageDelete: (ColorizedImage) -> Unit,
 ) {
+    var deleteTarget by remember { mutableStateOf<ColorizedImage?>(null) }
+
     Scaffold(
         containerColor = Color(0xFFFCFCFD),
         topBar = {
@@ -369,7 +390,10 @@ fun HomeScreen(
                             .height(displayHeight)
                             .clip(RoundedCornerShape(16.dp))
                             .background(Color(0xFFF1F3F5))
-                            .clickable { onImageClick(item) },
+                            .combinedClickable(
+                                onClick = { onImageClick(item) },
+                                onLongClick = { deleteTarget = item },
+                            ),
                     ) {
                         Image(
                             bitmap = item.colorized.asImageBitmap(),
@@ -383,6 +407,30 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    if (deleteTarget != null) {
+        AlertDialog(
+            onDismissRequest = { deleteTarget = null },
+            containerColor = Color(0xFF1E1E1E),
+            titleContentColor = Color.White,
+            textContentColor = Color(0xFFCCCCCC),
+            title = { Text("Delete image?", fontWeight = FontWeight.Bold, fontSize = 16.sp) },
+            text = { Text("This cannot be undone.", fontSize = 14.sp) },
+            confirmButton = {
+                TextButton(onClick = {
+                    deleteTarget?.let { onImageDelete(it) }
+                    deleteTarget = null
+                }) {
+                    Text("Delete", color = Color(0xFFFF6B6B), fontWeight = FontWeight.Medium)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { deleteTarget = null }) {
+                    Text("Cancel", color = Color(0xFF00BFA5), fontWeight = FontWeight.Medium)
+                }
+            },
+        )
     }
 }
 
@@ -604,6 +652,45 @@ private fun shareImage(context: Context, bitmap: Bitmap) {
         context.startActivity(Intent.createChooser(intent, "Share colorized photo"))
     } catch (e: Exception) {
         e.printStackTrace()
+    }
+}
+
+private fun getImagesDir(context: Context): File {
+    val dir = File(context.filesDir, "chromis")
+    if (!dir.exists()) dir.mkdirs()
+    return dir
+}
+
+private fun saveImagePair(context: Context, item: ColorizedImage) {
+    val dir = getImagesDir(context)
+    val orig = File(dir, "${item.timestamp}_original.png")
+    val color = File(dir, "${item.timestamp}_colorized.png")
+    FileOutputStream(orig).use { item.original.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    FileOutputStream(color).use { item.colorized.compress(Bitmap.CompressFormat.PNG, 100, it) }
+}
+
+private fun deleteImagePair(context: Context, id: Long) {
+    val dir = getImagesDir(context)
+    File(dir, "${id}_original.png").delete()
+    File(dir, "${id}_colorized.png").delete()
+}
+
+private fun loadHistoryFromDisk(context: Context): List<ColorizedImage> {
+    val dir = getImagesDir(context)
+    val files = dir.listFiles() ?: return emptyList()
+    val timestamps = files
+        .mapNotNull { it.nameWithoutExtension.substringBeforeLast("_").toLongOrNull() }
+        .distinct()
+        .sortedDescending()
+
+    return timestamps.mapNotNull { ts ->
+        val origFile = File(dir, "${ts}_original.png")
+        val colorFile = File(dir, "${ts}_colorized.png")
+        if (origFile.exists() && colorFile.exists()) {
+            val orig = android.graphics.BitmapFactory.decodeFile(origFile.absolutePath)
+            val color = android.graphics.BitmapFactory.decodeFile(colorFile.absolutePath)
+            if (orig != null && color != null) ColorizedImage(orig, color, ts) else null
+        } else null
     }
 }
 

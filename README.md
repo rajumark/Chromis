@@ -2,6 +2,10 @@
   <img src="docs/icon.png" alt="Chromis Logo" width="120"/>
 </p>
 
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+</p>
+
 # Chromis
 
 **AI-Powered Photo Colorizer — 100% On-Device**
@@ -12,9 +16,24 @@ Chromis brings black & white photos back to life using a deep neural network run
 
 - **One-tap colorization** — pick any B&W or color image from your gallery
 - **Touch-to-compare** — hold the screen to reveal the original, release to see the colorized result
-- **Staggered gallery** — home screen shows all your colorized images in a Pinterest-style grid
+- **Persistent gallery** — home screen shows all your colorized images in a Pinterest-style grid (survives app restarts)
+- **Long-press delete** — remove any image from your history
 - **Save & Share** — download to Downloads folder or share directly to any app
 - **100% offline** — no INTERNET permission, no analytics, no tracking
+
+## Showcase
+
+| Original | Colorized |
+|----------|-----------|
+| ![Original](docs/showcase/photo1_original.png) | ![Colorized](docs/showcase/photo1_colorized.png) |
+| ![Original](docs/showcase/photo2_original.png) | ![Colorized](docs/showcase/photo2_colorized.png) |
+| ![Original](docs/showcase/photo3_original.png) | ![Colorized](docs/showcase/photo3_colorized.png) |
+
+## App Screenshots
+
+| Home | Processing | Result |
+|------|-----------|--------|
+| ![Home](docs/screenshots/home_screen.png) | ![Processing](docs/screenshots/processing_screen.png) | ![Result](docs/screenshots/result_screen.png) |
 
 ## Tech Stack
 
@@ -77,4 +96,4 @@ Built by **Raju Shingadiya** — Edge AI Project
 
 ## License
 
-MIT
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
