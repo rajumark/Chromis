@@ -1064,6 +1064,58 @@
       color: #555;
     }
 
+    /* ── CREDIT CHIP ── */
+    .credit-chip-wrap {
+      text-align: center;
+      padding: 40px 0 60px;
+    }
+    .credit-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 28px 12px 14px;
+      border-radius: 100px;
+      background: #111;
+      border: 1px solid #222;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #ccc;
+      text-decoration: none;
+      position: relative;
+      transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s, border-color 0.35s;
+    }
+    .credit-chip:hover {
+      transform: scale(1.05);
+      box-shadow: 0 20px 60px rgba(255,255,255,0.06);
+      border-color: #555;
+    }
+    .credit-chip::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 100px;
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.06) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .credit-chip:hover::after {
+      opacity: 1;
+    }
+    .credit-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #333, #555);
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+    }
+    .credit-text {
+      position: relative;
+      z-index: 1;
+    }
+
     /* ══════════════════════════════════════════
        SCROLL ANIMATIONS
     ══════════════════════════════════════════ */
@@ -1191,11 +1243,7 @@
       <div class="float-label">100% Offline</div>
     </div>
 
-    <div class="hero-content">
-      <div class="hero-badge reveal">
-        <span class="dot"></span>
-        Open Source &middot; MIT License
-      </div>
+      <div class="hero-content">
       <h1 class="reveal">
         Restore <span class="faded">Your Memories</span>
       </h1>
@@ -1725,6 +1773,7 @@
           <div class="f-logo" style="display:flex;align-items:center;gap:8px;"><img src="icon.png" alt="" style="width:24px;height:24px;border-radius:4px;"> Chromis</div>
           <p>On-device AI photo colorizer for Android. Open source, MIT licensed. Built with ONNX Runtime, DDColor, and OpenCV.</p>
           <div class="f-author">Built by Raju Shingadiya</div>
+          <div class="f-badge" style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:5px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:999px;font-size:0.75rem;font-weight:500;color:#666;"><span style="width:5px;height:5px;border-radius:50%;background:#22c55e;display:inline-block;"></span> Open Source &middot; MIT License</div>
         </div>
         <div class="footer-col">
           <h4>Project</h4>
@@ -1750,6 +1799,13 @@
       </div>
     </div>
   </footer>
+
+  <div class="credit-chip-wrap">
+    <a href="https://rajumark.github.io/" class="credit-chip" target="_blank">
+      <div class="credit-avatar"></div>
+      <span class="credit-text">Raju Shingadiya</span>
+    </a>
+  </div>
 
   <!-- ══════════════════════════════════════════
        SCRIPTS
@@ -1832,6 +1888,17 @@
         const isOpen = item.classList.contains('open');
         document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
         if (!isOpen) item.classList.add('open');
+      });
+    });
+
+    // ── Credit chip mouse tracking ──
+    document.querySelectorAll('.credit-chip').forEach(chip => {
+      chip.addEventListener('mousemove', (e) => {
+        const rect = chip.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        chip.style.setProperty('--mx', x + '%');
+        chip.style.setProperty('--my', y + '%');
       });
     });
   </script>
