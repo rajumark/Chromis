@@ -475,6 +475,94 @@
     .edge-col.ondevice .edge-icon { background: rgba(255,255,255,0.08); color: #4ade80; }
 
     /* ══════════════════════════════════════════
+       SECTION — APP SCREENSHOTS
+    ══════════════════════════════════════════ */
+    .screenshots-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .screenshot-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+    .screenshot-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+    .screenshot-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .screenshot-caption {
+      padding: 14px 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #aaa;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .screenshots-row { grid-template-columns: 1fr; max-width: 360px; }
+    }
+
+    /* ══════════════════════════════════════════
+       SECTION — SHOWCASE
+    ══════════════════════════════════════════ */
+    .showcase-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .showcase-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .showcase-img-wrap {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #f5f5f5;
+      border: 1px solid var(--border);
+    }
+    .showcase-img-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .showcase-img-wrap:hover img {
+      transform: scale(1.03);
+    }
+    .showcase-label {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      padding: 5px 14px;
+      background: rgba(0,0,0,0.6);
+      color: var(--white);
+      font-size: 0.72rem;
+      font-weight: 600;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    @media (max-width: 768px) {
+      .showcase-pair { grid-template-columns: 1fr; }
+    }
+
+    /* ══════════════════════════════════════════
        SECTION — TECH STACK
     ══════════════════════════════════════════ */
     .tech-grid {
@@ -1041,6 +1129,8 @@
       </button>
       <ul class="nav-links">
         <li><a href="#features">Features</a></li>
+        <li><a href="#screenshots">Screenshots</a></li>
+        <li><a href="#showcase">Showcase</a></li>
         <li><a href="#stack">Stack</a></li>
         <li><a href="#pipeline">How it Works</a></li>
         <li><a href="#faq">FAQ</a></li>
@@ -1142,6 +1232,80 @@
   </section>
 
   <!-- ══════════════════════════════════════════
+       SECTION — APP SCREENSHOTS
+  ══════════════════════════════════════════ -->
+  <section class="section-dark" id="screenshots">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>See it in<br><span class="faded">action.</span></h2>
+        <p>The complete flow — from gallery to colorized result.</p>
+      </div>
+
+      <div class="screenshots-row reveal">
+        <div class="screenshot-card">
+          <img src="screenshots/home_screen.png" alt="Home screen" loading="lazy">
+          <div class="screenshot-caption">Home — Gallery Grid</div>
+        </div>
+        <div class="screenshot-card">
+          <img src="screenshots/processing_screen.png" alt="Processing screen" loading="lazy">
+          <div class="screenshot-caption">Processing — Lottie Animation</div>
+        </div>
+        <div class="screenshot-card">
+          <img src="screenshots/result_screen.png" alt="Result screen" loading="lazy">
+          <div class="screenshot-caption">Result — Touch to Compare</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       SECTION — SHOWCASE
+  ══════════════════════════════════════════ -->
+  <section class="section-light" id="showcase">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>Real results.<br><span class="faded">On your device.</span></h2>
+        <p>Every image colorized 100% locally — no cloud, no API, no data leaving your phone.</p>
+      </div>
+
+      <div class="showcase-grid">
+        <div class="showcase-pair reveal reveal-delay-1">
+          <div class="showcase-img-wrap">
+            <img src="showcase/photo1_original.png" alt="Original photo" loading="lazy">
+            <span class="showcase-label">Original</span>
+          </div>
+          <div class="showcase-img-wrap">
+            <img src="showcase/photo1_colorized.png" alt="Colorized photo" loading="lazy">
+            <span class="showcase-label">Colorized</span>
+          </div>
+        </div>
+
+        <div class="showcase-pair reveal reveal-delay-2">
+          <div class="showcase-img-wrap">
+            <img src="showcase/photo2_original.png" alt="Original photo" loading="lazy">
+            <span class="showcase-label">Original</span>
+          </div>
+          <div class="showcase-img-wrap">
+            <img src="showcase/photo2_colorized.png" alt="Colorized photo" loading="lazy">
+            <span class="showcase-label">Colorized</span>
+          </div>
+        </div>
+
+        <div class="showcase-pair reveal reveal-delay-3">
+          <div class="showcase-img-wrap">
+            <img src="showcase/photo3_original.png" alt="Original photo" loading="lazy">
+            <span class="showcase-label">Original</span>
+          </div>
+          <div class="showcase-img-wrap">
+            <img src="showcase/photo3_colorized.png" alt="Colorized photo" loading="lazy">
+            <span class="showcase-label">Colorized</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
        SECTION — TECH STACK
   ══════════════════════════════════════════ -->
   <section class="section-light" id="stack">
@@ -1153,42 +1317,42 @@
 
       <div class="tech-grid">
         <div class="tech-card reveal reveal-delay-1">
-          <div class="tc-icon">🧠</div>
+          <div class="tc-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M5 11h14a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1a2 2 0 0 1 2-2z"/><path d="M9 17h6"/></svg></div>
           <h3>DDColor Neural Network</h3>
           <p>Deep colourization model predicting chrominance channels in CIE Lab colour space. Tiny FP16 variant optimized for mobile.</p>
           <span class="tc-badge">129 MB ONNX</span>
         </div>
 
         <div class="tech-card reveal reveal-delay-2">
-          <div class="tc-icon">⚡</div>
+          <div class="tc-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
           <h3>ONNX Runtime</h3>
           <p>Microsoft's cross-platform ML inference engine. 4-thread parallel execution on-device with ALL_OPT optimization level.</p>
           <span class="tc-badge">v1.19.2</span>
         </div>
 
         <div class="tech-card reveal reveal-delay-3">
-          <div class="tc-icon">👁</div>
+          <div class="tc-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
           <h3>OpenCV</h3>
           <p>Image preprocessing and postprocessing. RGB→Lab conversion, channel splitting, chrominance upscaling back to original resolution.</p>
           <span class="tc-badge">v4.5.3</span>
         </div>
 
         <div class="tech-card reveal reveal-delay-1">
-          <div class="tc-icon">🎨</div>
+          <div class="tc-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
           <h3>Jetpack Compose</h3>
           <p>100% declarative UI with Material Design 3. No XML layouts. Single-activity architecture.</p>
           <span class="tc-badge">Material 3</span>
         </div>
 
         <div class="tech-card reveal reveal-delay-2">
-          <div class="tc-icon">📱</div>
+          <div class="tc-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></div>
           <h3>Multi-Arch Native</h3>
           <p>Native libraries compiled for arm64-v8a, armeabi-v7a, x86, and x86_64. Runs on every Android device.</p>
           <span class="tc-badge">4 ABIs</span>
         </div>
 
         <div class="tech-card reveal reveal-delay-3">
-          <div class="tc-icon">🔒</div>
+          <div class="tc-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
           <h3>Zero Network Calls</h3>
           <p>No INTERNET permission. No analytics. No telemetry. The APK itself proves it — grep the manifest.</p>
           <span class="tc-badge">Privacy First</span>
