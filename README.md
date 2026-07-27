@@ -73,7 +73,7 @@ The APK has **no INTERNET permission**. No analytics SDK. No crash reporting. No
 
 ## Credits
 
-Built by **Raju Shingadiya** — Edge AI Portfolio Project
+Built by **Raju Shingadiya** — Edge AI Project
 
 ## License
 

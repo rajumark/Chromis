@@ -68,7 +68,7 @@ jobs:
           - ~200MB RAM for model inference
 
           ### Credits
-          Built by **Raju Shingadiya** — Edge AI Portfolio Project
+          Built by **Raju Shingadiya** — Edge AI Project
           EOF
 
       - name: Create Release
