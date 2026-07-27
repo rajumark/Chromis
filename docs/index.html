@@ -913,6 +913,15 @@
       color: var(--gray-text);
       line-height: 1.7;
     }
+    .faq-answer a {
+      color: var(--gray-text);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.2s;
+    }
+    .faq-answer a:hover {
+      color: var(--black);
+    }
 
     /* ══════════════════════════════════════════
        FINAL CTA
@@ -1686,7 +1695,7 @@
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-answer">
-            <p>Chromis uses DDColor-Tiny, a deep learning colourization architecture exported to ONNX format (FP16). It predicts the a and b chrominance channels in CIE Lab colour space from a grayscale input, while preserving the original luminance channel for maximum detail retention.</p>
+            <p>Chromis uses <a target="_blank" href="https://github.com/piddnad/DDColor">DDColor-Tiny</a>, a deep learning colourization architecture exported to ONNX format (FP16). It predicts the a and b chrominance channels in <a target="_blank" href="https://en.wikipedia.org/wiki/CIELAB_color_space">CIE Lab colour space</a> from a grayscale input, while preserving the original luminance channel for maximum detail retention.</p>
           </div>
         </div>
 
@@ -1696,7 +1705,7 @@
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-answer">
-            <p>Cloud colourizers upload your photos to remote servers. Chromis runs the entire pipeline on your device — no network calls, no data leaving your phone. The APK doesn't even have the INTERNET permission declared. This is architectural privacy, not a privacy policy.</p>
+            <p>Cloud colourizers upload your photos to remote servers. <a target="_blank" href="https://github.com/rajumark/Chromis">Chromis runs the entire pipeline on your device</a> — no network calls, no data leaving your phone. The APK doesn't even have the <a target="_blank" href="https://github.com/rajumark/Chromis/blob/main/app/src/main/AndroidManifest.xml">INTERNET permission</a> declared. This is architectural privacy, not a privacy policy.</p>
           </div>
         </div>
 
@@ -1706,7 +1715,7 @@
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-answer">
-            <p>The DDColor model was trained and exported in ONNX format. ONNX Runtime provides cross-platform inference with aggressive graph optimizations and multi-threaded CPU execution. It's the standard format for model interoperability — train anywhere, run anywhere.</p>
+            <p>The DDColor model was trained and exported in ONNX format. <a target="_blank" href="https://onnxruntime.ai">ONNX Runtime</a> provides cross-platform inference with aggressive graph optimizations and multi-threaded CPU execution. It's the standard format for model interoperability — train anywhere, run anywhere.</p>
           </div>
         </div>
 
@@ -1736,7 +1745,7 @@
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-answer">
-            <p>Yes. The entire project is open source under the MIT license on GitHub. The inference engine is 102 lines in DDColorEngine.kt. The Compose UI is 393 lines in MainActivity.kt. Total Kotlin: 555 lines across 6 files.</p>
+            <p>Yes. The entire project is open source under the MIT license on <a target="_blank" href="https://github.com/rajumark/Chromis">GitHub</a>. The inference engine is 102 lines in <a target="_blank" href="https://github.com/rajumark/Chromis/blob/main/app/src/main/java/raju/shingadiya/chromis/engine/DDColorEngine.kt">DDColorEngine.kt</a>. The Compose UI is 393 lines in <a target="_blank" href="https://github.com/rajumark/Chromis/blob/main/app/src/main/java/raju/shingadiya/chromis/MainActivity.kt">MainActivity.kt</a>. Total Kotlin: 555 lines across 6 files.</p>
           </div>
         </div>
       </div>
