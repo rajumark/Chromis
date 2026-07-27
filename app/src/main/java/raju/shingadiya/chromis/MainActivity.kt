@@ -58,6 +58,10 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FloatingActionButton
@@ -143,8 +147,9 @@ data class ColorizedImage(
 
 @Composable
 fun ChromisApp(engine: DDColorEngine?) {
-    var currentScreen by remember { mutableStateOf<String>("home") }
+    var currentScreen by remember { mutableStateOf("home") }
     var activeImage by remember { mutableStateOf<ColorizedImage?>(null) }
+    var isProcessing by remember { mutableStateOf(false) }
     val history = remember { mutableStateListOf<ColorizedImage>() }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showDemo by remember { mutableStateOf(false) }
@@ -164,14 +169,32 @@ fun ChromisApp(engine: DDColorEngine?) {
                     MediaStore.Images.Media.getBitmap(context.contentResolver, it)
                 }
 
-                val result = engine?.colorize(bitmap)
-                if (result != null) {
-                    val item = ColorizedImage(bitmap, result)
-                    history.add(0, item)
-                    activeImage = item
-                    currentScreen = "image"
-                } else {
-                    errorMessage = "Model not loaded.\n\nMake sure ddcolor-tiny-fp16.onnx is in assets."
+                val item = ColorizedImage(bitmap, bitmap)
+                activeImage = item
+                isProcessing = true
+                currentScreen = "image"
+
+                scope.launch(Dispatchers.Default) {
+                    try {
+                        val result = engine?.colorize(bitmap)
+                        withContext(Dispatchers.Main) {
+                            if (result != null) {
+                                val final = ColorizedImage(bitmap, result)
+                                history.add(0, final)
+                                activeImage = final
+                            } else {
+                                errorMessage = "Model not loaded.\n\nMake sure ddcolor-tiny-fp16.onnx is in assets."
+                            }
+                            isProcessing = false
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            val sw = StringWriter()
+                            e.printStackTrace(PrintWriter(sw))
+                            errorMessage = "${e.message}\n\n${sw.toString()}"
+                            isProcessing = false
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 val sw = StringWriter()
@@ -199,6 +222,7 @@ fun ChromisApp(engine: DDColorEngine?) {
             )
             "image" -> ImageScreen(
                 image = activeImage,
+                isProcessing = isProcessing,
                 onBack = { currentScreen = "home" },
                 onPickAnother = { imageLauncher.launch("image/*") },
                 onError = { errorMessage = it },
@@ -366,6 +390,7 @@ fun HomeScreen(
 @Composable
 fun ImageScreen(
     image: ColorizedImage?,
+    isProcessing: Boolean,
     onBack: () -> Unit,
     onPickAnother: () -> Unit,
     onError: (String) -> Unit,
@@ -384,12 +409,14 @@ fun ImageScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        "Hold to compare",
-                        color = Color.White.copy(alpha = 0.5f),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Normal,
-                    )
+                    if (!isProcessing) {
+                        Text(
+                            "Hold to compare",
+                            color = Color.White.copy(alpha = 0.5f),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Normal,
+                        )
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -406,71 +433,73 @@ fun ImageScreen(
             )
         },
         bottomBar = {
-            Surface(
-                color = Color(0xFF1A1C1E),
-                modifier = Modifier.navigationBarsPadding(),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+            if (!isProcessing) {
+                Surface(
+                    color = Color(0xFF1A1C1E),
+                    modifier = Modifier.navigationBarsPadding(),
                 ) {
-                    Button(
-                        onClick = {
-                            isSaving = true
-                            saveToDownloads(context, image.colorized) { success ->
-                                isSaving = false
-                                Toast.makeText(
-                                    context,
-                                    if (success) "Saved to Downloads" else "Save failed",
-                                    Toast.LENGTH_SHORT,
-                                ).show()
-                            }
-                        },
-                        enabled = !isSaving,
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White,
-                            contentColor = Color(0xFF1A1C1E),
-                        ),
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        if (isSaving) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(18.dp),
-                                strokeWidth = 2.dp,
-                                color = Color(0xFF1A1C1E),
-                            )
-                        } else {
+                        Button(
+                            onClick = {
+                                isSaving = true
+                                saveToDownloads(context, image.colorized) { success ->
+                                    isSaving = false
+                                    Toast.makeText(
+                                        context,
+                                        if (success) "Saved to Downloads" else "Save failed",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                                }
+                            },
+                            enabled = !isSaving,
+                            modifier = Modifier.weight(1f).height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.White,
+                                contentColor = Color(0xFF1A1C1E),
+                            ),
+                        ) {
+                            if (isSaving) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(18.dp),
+                                    strokeWidth = 2.dp,
+                                    color = Color(0xFF1A1C1E),
+                                )
+                            } else {
+                                Icon(
+                                    Icons.Default.Download,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Save", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            }
+                        }
+
+                        Button(
+                            onClick = {
+                                shareImage(context, image.colorized)
+                            },
+                            modifier = Modifier.weight(1f).height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF1A73E8),
+                                contentColor = Color.White,
+                            ),
+                        ) {
                             Icon(
-                                Icons.Default.Download,
+                                Icons.Default.Share,
                                 contentDescription = null,
                                 modifier = Modifier.size(18.dp),
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Save", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            Text("Share", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         }
-                    }
-
-                    Button(
-                        onClick = {
-                            shareImage(context, image.colorized)
-                        },
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF1A73E8),
-                            contentColor = Color.White,
-                        ),
-                    ) {
-                        Icon(
-                            Icons.Default.Share,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Share", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -484,23 +513,51 @@ fun ImageScreen(
             contentAlignment = Alignment.Center,
         ) {
             Image(
-                bitmap = (if (showColorized) image.colorized else image.original).asImageBitmap(),
-                contentDescription = if (showColorized) "Colorized" else "Original",
+                bitmap = (if (isProcessing || !showColorized) image.original else image.colorized).asImageBitmap(),
+                contentDescription = if (isProcessing || !showColorized) "Original" else "Colorized",
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 4.dp)
                     .clip(RoundedCornerShape(4.dp))
-                    .pointerInput(Unit) {
-                        awaitEachGesture {
-                            awaitFirstDown(requireUnconsumed = false)
-                            showColorized = false
-                            waitForUpOrCancellation()
-                            showColorized = true
-                        }
-                    },
+                    .then(
+                        if (!isProcessing) {
+                            Modifier.pointerInput(Unit) {
+                                awaitEachGesture {
+                                    awaitFirstDown(requireUnconsumed = false)
+                                    showColorized = false
+                                    waitForUpOrCancellation()
+                                    showColorized = true
+                                }
+                            }
+                        } else Modifier
+                    ),
                 contentScale = ContentScale.Fit,
             )
 
+            if (isProcessing) {
+                val composition by rememberLottieComposition(LottieCompositionSpec.Asset("painting_loaders.json"))
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .navigationBarsPadding()
+                        .padding(bottom = 80.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    LottieAnimation(
+                        composition = composition,
+                        iterations = LottieConstants.IterateForever,
+                        reverseOnRepeat = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        "Colorizing...",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+            }
         }
     }
 }

@@ -65,4 +65,7 @@ dependencies {
 
     // Coroutines for running inference off the main UI thread
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+
+    // Lottie for loading animations
+    implementation("com.airbnb.android:lottie-compose:6.3.0")
 }
