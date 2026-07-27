@@ -192,15 +192,18 @@
       background: #22c55e;
     }
     .hero h1 {
-      font-size: 72px;
+      font-size: 56px;
       font-weight: 600;
       letter-spacing: -0.02em;
-      line-height: 0.92;
+      line-height: 1;
       margin-bottom: 28px;
       color: var(--black);
     }
     .hero h1 .faded {
       opacity: 0.3;
+    }
+    .hero h1 .hero-hl-br {
+      display: none;
     }
     .hero-sub {
       font-size: 18px;
@@ -618,74 +621,95 @@
     /* ══════════════════════════════════════════
        SECTION — INFERENCE PIPELINE
     ══════════════════════════════════════════ */
-    .pipeline-flow {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 16px;
-      position: relative;
-      max-width: 1100px;
+    /* ── PIPELINE VISUAL CARDS ── */
+    .pipeline-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0;
+      max-width: 1140px;
       margin: 0 auto;
     }
-    .pipeline-flow::before {
-      content: '';
-      position: absolute;
-      top: 40px;
-      left: 10%;
-      right: 10%;
-      height: 2px;
-      background: var(--border);
-      z-index: 0;
+    .pipeline-card {
+      flex: 1 1 180px;
+      max-width: 200px;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 20px;
+      padding: 32px 24px;
+      text-align: center;
+      transition: all 0.4s ease;
     }
-    .pipeline-flow .line-fill {
-      position: absolute;
-      top: 40px;
-      left: 10%;
-      height: 2px;
-      background: var(--black);
-      width: 0;
-      z-index: 1;
-      transition: width 2s ease;
+    .pipeline-card:hover {
+      transform: translateY(-6px);
+      border-color: #444;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
     }
-    .pipeline-flow.animated .line-fill {
-      width: 80%;
-    }
-    .pipeline-step {
+    .pipeline-card .pc-visual {
+      position: relative;
+      width: 80px;
+      height: 94px;
+      margin: 0 auto 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      text-align: center;
-      position: relative;
-      z-index: 2;
     }
-    .pipeline-step .ps-num {
-      width: 56px;
-      height: 56px;
+    .pipeline-card .pc-visual .pc-labels {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .pipeline-card .pc-visual .pc-labels span {
+      padding: 2px 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 999px;
+      font-size: 0.6rem;
+      font-weight: 500;
+      color: #666;
+    }
+    .pipeline-card .pc-num {
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      background: var(--white);
-      border: 2px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid #333;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--gray-text);
-      margin-bottom: 20px;
-      transition: all 0.5s ease;
-    }
-    .pipeline-step.active .ps-num {
-      background: var(--black);
-      border-color: var(--black);
-      color: var(--white);
-    }
-    .pipeline-step h4 {
-      font-size: 0.9rem;
+      font-size: 0.75rem;
       font-weight: 600;
-      margin-bottom: 6px;
+      color: #888;
+      margin: 0 auto 16px;
+      transition: all 0.4s ease;
     }
-    .pipeline-step p {
+    .pipeline-card:hover .pc-num {
+      background: var(--white);
+      border-color: var(--white);
+      color: var(--black);
+    }
+    .pipeline-card h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .pipeline-card p {
       font-size: 0.78rem;
-      color: var(--gray-text);
-      max-width: 150px;
+      color: #666;
+      line-height: 1.6;
+    }
+    .pipeline-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 32px;
+      padding-top: 52px;
+    }
+    .pipeline-arrow svg {
+      flex-shrink: 0;
     }
 
     /* ══════════════════════════════════════════
@@ -1170,9 +1194,7 @@
         Open Source &middot; MIT License
       </div>
       <h1 class="reveal">
-        Bring Black &<br>
-        White Photos<br>
-        <span class="faded">Back to Life.</span>
+        Bring Black &amp; White Photos <span class="faded">Back to Life.</span>
       </h1>
       <p class="hero-sub reveal reveal-delay-1">
         An Android app that colorizes black & white photos using a deep neural network running entirely on your device. No cloud. No API. No data leaving your phone.
@@ -1371,37 +1393,144 @@
         <p>From gallery picker to colorized output — the complete on-device ML flow.</p>
       </div>
 
-      <div class="pipeline-flow" id="pipelineFlow">
-        <div class="line-fill"></div>
-
-        <div class="pipeline-step reveal reveal-delay-1">
-          <div class="ps-num">01</div>
+      <div class="pipeline-grid">
+        <div class="pipeline-card reveal reveal-delay-1">
+          <div class="pc-visual">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <rect x="20" y="12" width="40" height="56" rx="6" stroke="#555" stroke-width="1.5"/>
+              <rect x="30" y="22" width="20" height="24" rx="3" fill="#333" stroke="#555" stroke-width="1"/>
+              <circle cx="40" cy="34" r="4" fill="#555"/>
+              <rect x="30" y="52" width="20" height="3" rx="1.5" fill="#444"/>
+              <rect x="33" y="58" width="14" height="2" rx="1" fill="#444"/>
+              <line x1="8" y1="40" x2="20" y2="40" stroke="#555" stroke-width="1.5"/>
+              <polygon points="18,36 18,44 14,40" fill="#555"/>
+              <line x1="60" y1="40" x2="72" y2="40" stroke="#555" stroke-width="1.5"/>
+              <polygon points="62,36 62,44 66,40" fill="#555"/>
+            </svg>
+            <div class="pc-labels">
+              <span>Input</span>
+              <span>Gallery</span>
+            </div>
+          </div>
+          <div class="pc-num">01</div>
           <h4>Pick Photo</h4>
-          <p>Gallery intent decodes image to Bitmap</p>
+          <p>The user selects a black & white photo from the device gallery. The app decodes it into a Bitmap for processing.</p>
         </div>
 
-        <div class="pipeline-step reveal reveal-delay-2">
-          <div class="ps-num">02</div>
+        <div class="pipeline-arrow reveal reveal-delay-1">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+
+        <div class="pipeline-card reveal reveal-delay-2">
+          <div class="pc-visual">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <rect x="10" y="20" width="26" height="40" rx="4" stroke="#555" stroke-width="1.5"/>
+              <text x="23" y="44" text-anchor="middle" font-size="9" fill="#888" font-family="Inter,sans-serif">RGB</text>
+              <line x1="40" y1="40" x2="50" y2="40" stroke="#555" stroke-width="1.5"/>
+              <polygon points="48,36 48,44 52,40" fill="#555"/>
+              <rect x="44" y="12" width="26" height="56" rx="4" stroke="#555" stroke-width="1.5"/>
+              <text x="57" y="38" text-anchor="middle" font-size="9" fill="#888" font-family="Inter,sans-serif">Lab</text>
+              <text x="57" y="50" text-anchor="middle" font-size="7" fill="#666" font-family="Inter,sans-serif">L + a + b</text>
+            </svg>
+            <div class="pc-labels">
+              <span>OpenCV</span>
+              <span>Color Space</span>
+            </div>
+          </div>
+          <div class="pc-num">02</div>
           <h4>Lab Conversion</h4>
-          <p>OpenCV converts RGB→CIE Lab, extracts L channel</p>
+          <p>OpenCV converts the image from RGB to CIE Lab colour space. The L (luminance) channel carries all structural detail.</p>
         </div>
 
-        <div class="pipeline-step reveal reveal-delay-3">
-          <div class="ps-num">03</div>
+        <div class="pipeline-arrow reveal reveal-delay-2">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+
+        <div class="pipeline-card reveal reveal-delay-3">
+          <div class="pc-visual">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <circle cx="28" cy="30" r="6" fill="#2a2a2a" stroke="#555" stroke-width="1"/>
+              <circle cx="52" cy="30" r="6" fill="#2a2a2a" stroke="#555" stroke-width="1"/>
+              <circle cx="40" cy="48" r="6" fill="#2a2a2a" stroke="#555" stroke-width="1"/>
+              <circle cx="28" cy="66" r="6" fill="#2a2a2a" stroke="#555" stroke-width="1"/>
+              <circle cx="52" cy="66" r="6" fill="#2a2a2a" stroke="#555" stroke-width="1"/>
+              <line x1="34" y1="30" x2="46" y2="30" stroke="#555" stroke-width="0.8"/>
+              <line x1="52" y1="36" x2="46" y2="42" stroke="#555" stroke-width="0.8"/>
+              <line x1="28" y1="36" x2="34" y2="42" stroke="#555" stroke-width="0.8"/>
+              <line x1="40" y1="54" x2="34" y2="60" stroke="#555" stroke-width="0.8"/>
+              <line x1="40" y1="54" x2="46" y2="60" stroke="#555" stroke-width="0.8"/>
+              <circle cx="40" cy="30" r="3" fill="#4a90d9" opacity="0.6"/>
+              <circle cx="28" cy="48" r="3" fill="#4a90d9" opacity="0.6"/>
+              <circle cx="52" cy="48" r="3" fill="#4a90d9" opacity="0.6"/>
+              <circle cx="40" cy="66" r="3" fill="#4a90d9" opacity="0.6"/>
+            </svg>
+            <div class="pc-labels">
+              <span>ONNX Runtime</span>
+              <span>4 Threads</span>
+            </div>
+          </div>
+          <div class="pc-num">03</div>
           <h4>ONNX Inference</h4>
-          <p>DDColor-Tiny predicts a,b chrominance at 512×512</p>
+          <p>The DDColor-Tiny model predicts the a and b chrominance channels at 512×512 resolution using 4 parallel CPU threads.</p>
         </div>
 
-        <div class="pipeline-step reveal reveal-delay-4">
-          <div class="ps-num">04</div>
+        <div class="pipeline-arrow reveal reveal-delay-3">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+
+        <div class="pipeline-card reveal reveal-delay-4">
+          <div class="pc-visual">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <rect x="10" y="28" width="22" height="28" rx="2" fill="#222" stroke="#555" stroke-width="1"/>
+              <line x1="21" y1="28" x2="21" y2="56" stroke="#555" stroke-width="0.5" opacity="0.3"/>
+              <line x1="10" y1="42" x2="32" y2="42" stroke="#555" stroke-width="0.5" opacity="0.3"/>
+              <text x="21" y="22" text-anchor="middle" font-size="6" fill="#666" font-family="Inter,sans-serif">512×512</text>
+              <line x1="36" y1="42" x2="44" y2="42" stroke="#555" stroke-width="1.5"/>
+              <polygon points="42,38 42,46 46,42" fill="#555"/>
+              <rect x="48" y="20" width="22" height="40" rx="2" fill="#222" stroke="#555" stroke-width="1"/>
+              <line x1="59" y1="20" x2="59" y2="60" stroke="#555" stroke-width="0.5" opacity="0.3"/>
+              <line x1="48" y1="40" x2="70" y2="40" stroke="#555" stroke-width="0.5" opacity="0.3"/>
+              <text x="59" y="14" text-anchor="middle" font-size="6" fill="#666" font-family="Inter,sans-serif">Original Res</text>
+            </svg>
+            <div class="pc-labels">
+              <span>OpenCV</span>
+              <span>Upscale</span>
+            </div>
+          </div>
+          <div class="pc-num">04</div>
           <h4>Upscale & Merge</h4>
-          <p>Chrominance upscaled to original resolution, merged with L</p>
+          <p>The predicted chrominance is resized back to the original image resolution, then merged with the original L channel.</p>
         </div>
 
-        <div class="pipeline-step reveal reveal-delay-4">
-          <div class="ps-num">05</div>
+        <div class="pipeline-arrow reveal reveal-delay-4">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+
+        <div class="pipeline-card reveal reveal-delay-4">
+          <div class="pc-visual">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <rect x="10" y="16" width="26" height="48" rx="4" stroke="#555" stroke-width="1.5"/>
+              <text x="23" y="52" text-anchor="middle" font-size="7" fill="#666" font-family="Inter,sans-serif">B&W</text>
+              <rect x="44" y="16" width="26" height="48" rx="4" stroke="#555" stroke-width="1.5"/>
+              <defs>
+                <linearGradient id="colorGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#4a90d9"/>
+                  <stop offset="50%" stop-color="#e8a87c"/>
+                  <stop offset="100%" stop-color="#85c88a"/>
+                </linearGradient>
+              </defs>
+              <rect x="44" y="16" width="26" height="48" rx="4" fill="url(#colorGrad)" opacity="0.5"/>
+              <text x="57" y="52" text-anchor="middle" font-size="7" fill="#fff" font-family="Inter,sans-serif">Color</text>
+              <line x1="38" y1="16" x2="38" y2="64" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/>
+            </svg>
+            <div class="pc-labels">
+              <span>Result</span>
+              <span>Side-by-Side</span>
+            </div>
+          </div>
+          <div class="pc-num">05</div>
           <h4>Colour Output</h4>
-          <p>Lab→RGB conversion, side-by-side comparison displayed</p>
+          <p>Lab is converted back to RGB. The app displays a side-by-side comparison — original on the left, colorized on the right.</p>
         </div>
       </div>
     </div>
