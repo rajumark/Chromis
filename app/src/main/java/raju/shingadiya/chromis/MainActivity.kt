@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -44,13 +45,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
@@ -81,6 +87,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -103,6 +110,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         OpenCVLoader.initDebug()
         try {
             colorEngine = DDColorEngine(this)
@@ -139,6 +147,7 @@ fun ChromisApp(engine: DDColorEngine?) {
     var activeImage by remember { mutableStateOf<ColorizedImage?>(null) }
     val history = remember { mutableStateListOf<ColorizedImage>() }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var showDemo by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -265,48 +274,57 @@ fun HomeScreen(
         },
     ) { padding ->
         if (history.isEmpty()) {
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding),
-                contentAlignment = Alignment.Center,
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Text(
+                    "See what Chromis can do",
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF1A1C1E),
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    "Pick a photo below to try it yourself",
+                    fontSize = 13.sp,
+                    color = Color(0xFF9AA0A6),
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onPickImage,
-                    ),
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(88.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFF1F3F5)),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = null,
-                            tint = Color(0xFF9AA0A6),
-                            modifier = Modifier.size(36.dp),
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        "Pick a black & white photo",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF5F6368),
+                    DemoCard(
+                        label = "Original",
+                        imageRes = R.drawable.demo_original,
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        "Chromis will colourize it instantly",
-                        fontSize = 13.sp,
-                        color = Color(0xFF9AA0A6),
+                    DemoCard(
+                        label = "Colourized",
+                        imageRes = R.drawable.demo_colorized,
                     )
                 }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = null,
+                    tint = Color(0xFFD0D0D0),
+                    modifier = Modifier.size(40.dp),
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "Tap + to get started",
+                    fontSize = 13.sp,
+                    color = Color(0xFF9AA0A6),
+                )
             }
         } else {
             LazyVerticalStaggeredGrid(
@@ -354,7 +372,6 @@ fun ImageScreen(
 ) {
     var showColorized by remember { mutableStateOf(true) }
     var isSaving by remember { mutableStateOf(false) }
-    var isSharing by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     if (image == null) {
@@ -366,7 +383,14 @@ fun ImageScreen(
         containerColor = Color(0xFF1A1C1E),
         topBar = {
             TopAppBar(
-                title = { },
+                title = {
+                    Text(
+                        "Hold to compare",
+                        color = Color.White.copy(alpha = 0.5f),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -392,7 +416,7 @@ fun ImageScreen(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    OutlinedButton(
+                    Button(
                         onClick = {
                             isSaving = true
                             saveToDownloads(context, image.colorized) { success ->
@@ -405,46 +429,48 @@ fun ImageScreen(
                             }
                         },
                         enabled = !isSaving,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).height(48.dp),
                         shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = Color(0xFF1A1C1E),
+                        ),
                     ) {
                         if (isSaving) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
+                                modifier = Modifier.size(18.dp),
                                 strokeWidth = 2.dp,
-                                color = Color(0xFF1A73E8),
-                            )
-                        } else {
-                            Text("Save", fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                        }
-                    }
-
-                    OutlinedButton(
-                        onClick = {
-                            isSharing = true
-                            shareImage(context, image.colorized) {
-                                isSharing = false
-                            }
-                        },
-                        enabled = !isSharing,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                    ) {
-                        if (isSharing) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                strokeWidth = 2.dp,
-                                color = Color(0xFF1A73E8),
+                                color = Color(0xFF1A1C1E),
                             )
                         } else {
                             Icon(
-                                Icons.Default.Share,
+                                Icons.Default.Download,
                                 contentDescription = null,
-                                modifier = Modifier.size(16.dp),
+                                modifier = Modifier.size(18.dp),
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Share", fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                            Text("Save", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         }
+                    }
+
+                    Button(
+                        onClick = {
+                            shareImage(context, image.colorized)
+                        },
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF1A73E8),
+                            contentColor = Color.White,
+                        ),
+                    ) {
+                        Icon(
+                            Icons.Default.Share,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Share", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -475,23 +501,6 @@ fun ImageScreen(
                 contentScale = ContentScale.Fit,
             )
 
-            val label = if (showColorized) "Colorized" else "Original (hold to compare)"
-            Surface(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .statusBarsPadding()
-                    .padding(top = 8.dp),
-                shape = RoundedCornerShape(999.dp),
-                color = Color(0xCC000000),
-            ) {
-                Text(
-                    label,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                )
-            }
         }
     }
 }
@@ -519,7 +528,7 @@ private fun saveToDownloads(context: Context, bitmap: Bitmap, onResult: (Boolean
     }
 }
 
-private fun shareImage(context: Context, bitmap: Bitmap, onDone: () -> Unit) {
+private fun shareImage(context: Context, bitmap: Bitmap) {
     try {
         val file = File(context.cacheDir, "chromis_share.png")
         FileOutputStream(file).use { out ->
@@ -535,9 +544,37 @@ private fun shareImage(context: Context, bitmap: Bitmap, onDone: () -> Unit) {
             putExtra(Intent.EXTRA_STREAM, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        context.startActivity(Intent.createChooser(intent, "Share colourized photo"))
-} catch (e: Exception) {
-    e.printStackTrace()
+        context.startActivity(Intent.createChooser(intent, "Share colorized photo"))
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }
-onDone()
+
+@Composable
+private fun DemoCard(label: String, imageRes: Int) {
+    Column {
+        Text(
+            label,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFF5F6368),
+            modifier = Modifier.padding(bottom = 6.dp),
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color(0xFFF1F3F5)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = label,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp)),
+                contentScale = ContentScale.FillWidth,
+            )
+        }
+    }
 }
