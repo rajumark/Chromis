@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/icon.png" alt="Chromis Logo" width="120"/>
+</p>
+
 # Chromis
 
 **AI-Powered Photo Colorizer — 100% On-Device**
@@ -42,8 +46,9 @@ Chromis brings black & white photos back to life using a deep neural network run
 git clone https://github.com/rajumark/Chromis.git
 cd Chromis
 
-# Download the DDColor-Tiny FP16 ONNX model (129MB, not in repo due to GitHub size limit)
-# Place it in app/src/main/assets/ddcolor-tiny-fp16.onnx
+# Model is tracked via Git LFS — ensure you have it installed:
+git lfs install
+git lfs pull
 
 # Build
 ./gradlew assembleDebug
